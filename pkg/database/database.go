@@ -22,7 +22,7 @@ func InitializeMainDatabase(ctx context.Context) *sql.DB {
 	if err != nil {
 		log.Fatalf("an error occured on connecting to database : %s", err.Error())
 	} else {
-		log.Fatalf("connection to database success")
+		log.Printf("connection to database success")
 	}
 
 	return db

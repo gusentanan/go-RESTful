@@ -34,7 +34,7 @@ func Connection(d DatabaseConnection) chan DatabaseChan {
 		if err != nil {
 			c <- DatabaseChan{DB: nil, err: err}
 		}
-
+		err = db.Ping()
 		c <- DatabaseChan{DB: db, err: err}
 	}()
 
