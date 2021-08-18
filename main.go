@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	router "github.com/gusentanan/go-RESTful/pkg/routes"
+	"github.com/gusentanan/go-RESTful/pkg/routes"
 	"github.com/joho/godotenv"
 )
 
@@ -34,7 +34,7 @@ func main() {
 
 	loadEnv()
 	address := getAddress()
-	mux := router.Router()
+	mux := routes.Router()
 
 	listenToHttpReq(address, mux)
 
