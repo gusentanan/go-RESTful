@@ -12,12 +12,12 @@ const (
 	GET_SPECIFIC_PRODUCT_STMT string = "SELECT * FROM products WHERE productName = ?"
 	GET_ALL_PRODUCT_STMT      string = "SELECT * FROM products"
 	DELETE_PRODUCT_STMT       string = "DELETE FROM products WHERE productName = ? "
-	UPDATE_PRODUCT_STMT       string = "UPDATE products SET ProductName = ?, price = ?, shortDesc = ? WHERE ID = ?"
+	UPDATE_PRODUCT_STMT       string = "UPDATE products SET productName = ?, price = ?, shortDesc = ? WHERE id = ?"
 )
 
 type Product struct {
 	ID               int64  `json:"id"`
-	ProductName      string `json:"productsName"`
+	ProductName      string `json:"productName"`
 	Price            int64  `json:"price"`
 	ShortDescription string `json:"shortDesc"`
 }
@@ -51,7 +51,7 @@ func (pm *ProductModel) Insert(product Product) error {
 func (pm *ProductModel) GetAll() (*Products, error) {
 	res, err := pm.DB.Query(GET_ALL_PRODUCT_STMT)
 	if err != nil {
-		log.Printf("error occured on gx`etting all the products : %s", err)
+		log.Printf("error occured on getting all the products : %s", err)
 	}
 
 	defer res.Close()
@@ -66,8 +66,8 @@ func (pm *ProductModel) GetAll() (*Products, error) {
 }
 
 // get specific product
-func (pm *ProductModel) GetSpec(productName string) (*Products, error) {
-	res, err := pm.DB.Query(GET_SPECIFIC_PRODUCT_STMT, productName)
+func (pm *ProductModel) GetSpec(p Product) (*Products, error) {
+	res, err := pm.DB.Query(GET_SPECIFIC_PRODUCT_STMT, p.ProductName)
 	if err != nil {
 		log.Printf("error occurred on getting specific product : %s", err)
 		return nil, err
@@ -76,16 +76,17 @@ func (pm *ProductModel) GetSpec(productName string) (*Products, error) {
 	defer res.Close()
 
 	var singleProduct Products
-	product := Product{}
-	res.Scan(&product.ID, &product.ProductName, &product.Price, &product.ShortDescription)
-	singleProduct = append(singleProduct, &product)
-
+	for res.Next() {
+		product := &Product{}
+		res.Scan(&product.ID, &product.ProductName, &product.Price, &product.ShortDescription)
+		singleProduct = append(singleProduct, product)
+	}
 	return &singleProduct, nil
 }
 
 // delete single product
-func (pm *ProductModel) Delete(productID int64) error {
-	if _, err := pm.DB.Query(DELETE_PRODUCT_STMT, productID); err != nil {
+func (pm *ProductModel) Delete(product Product) error {
+	if _, err := pm.DB.Query(DELETE_PRODUCT_STMT, product.ProductName); err != nil {
 		log.Printf("error occurred on deleting a specific product : %s", err)
 		return err
 	}
@@ -95,7 +96,7 @@ func (pm *ProductModel) Delete(productID int64) error {
 
 // update single product
 func (pm *ProductModel) Update(product Product) error {
-	if _, err := pm.DB.Query(UPDATE_PRODUCT_STMT, product.ProductName, product.Price, product.ShortDescription); err != nil {
+	if _, err := pm.DB.Query(UPDATE_PRODUCT_STMT, product.ProductName, product.Price, product.ShortDescription, product.ID); err != nil {
 		log.Printf("error occurred on updating a specific product : %s", err)
 		return err
 	}

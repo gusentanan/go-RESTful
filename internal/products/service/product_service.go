@@ -12,14 +12,14 @@ func GetAllProduct(pm *model.ProductModel) (*model.Products, error) {
 	return products, err
 }
 
-func DeleteSingleProduct(productID int64, pm *model.ProductModel) error {
-	err := pm.Delete(productID)
+func DeleteSingleProduct(product model.Product, pm *model.ProductModel) error {
+	err := pm.Delete(product)
 	return err
 }
 
-func GetSingleProduct(productName string, pm *model.ProductModel) (*model.Products, error) {
-	product, err := pm.GetSpec(productName)
-	return product, err
+func GetSingleProduct(product model.Product, pm *model.ProductModel) (*model.Products, error) {
+	singleProduct, err := pm.GetSpec(product)
+	return singleProduct, err
 }
 
 func UpdateSingleProduct(product model.Product, pm *model.ProductModel) error {
