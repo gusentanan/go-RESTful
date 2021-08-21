@@ -28,17 +28,17 @@ type ProductModel struct {
 	DB *sql.DB
 }
 
-// to parse argument from non-json to json
+// bundle data with respect to json formats
 func (product Products) ToJSON(w io.Writer) error {
 	return json.NewEncoder(w).Encode(product)
 }
 
-// to parse argument from json to non-json
+// revert encode data back to original form
 func (product *Product) FromJSON(r io.Reader) error {
 	return json.NewDecoder(r).Decode(product)
 }
 
-// insert one product
+// insert single product to MySQL database
 func (pm *ProductModel) Insert(product Product) error {
 	if _, err := pm.DB.Exec(INSERT_PRODUCT_STMT, product.ProductName, product.Price, product.ShortDescription); err != nil {
 		log.Printf("error occured on inserting product : %s", err)
@@ -47,7 +47,7 @@ func (pm *ProductModel) Insert(product Product) error {
 	return nil
 }
 
-// get all products
+// get all products from MySQL database
 func (pm *ProductModel) GetAll() (*Products, error) {
 	res, err := pm.DB.Query(GET_ALL_PRODUCT_STMT)
 	if err != nil {
@@ -65,7 +65,7 @@ func (pm *ProductModel) GetAll() (*Products, error) {
 	return &products, nil
 }
 
-// get specific product
+// get specific product from MySQL database
 func (pm *ProductModel) GetSpec(p Product) (*Products, error) {
 	res, err := pm.DB.Query(GET_SPECIFIC_PRODUCT_STMT, p.ProductName)
 	if err != nil {
@@ -84,17 +84,16 @@ func (pm *ProductModel) GetSpec(p Product) (*Products, error) {
 	return &singleProduct, nil
 }
 
-// delete single product
+// delete single product from MySQL database
 func (pm *ProductModel) Delete(product Product) error {
 	if _, err := pm.DB.Query(DELETE_PRODUCT_STMT, product.ProductName); err != nil {
 		log.Printf("error occurred on deleting a specific product : %s", err)
 		return err
 	}
-	// add some json response after successfull run
 	return nil
 }
 
-// update single product
+// update product from MySQL database
 func (pm *ProductModel) Update(product Product) error {
 	if _, err := pm.DB.Query(UPDATE_PRODUCT_STMT, product.ProductName, product.Price, product.ShortDescription, product.ID); err != nil {
 		log.Printf("error occurred on updating a specific product : %s", err)
